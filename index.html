@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Techverse 2025 Hackathon</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #2a2a72;
+        --secondary: #009ffd;
+        --accent: #ff0076;
+      }
+
+      body {
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        min-height: 100vh;
+      }
+
+      .hero-section {
+        background: linear-gradient(
+          rgba(42, 42, 114, 0.9),
+          rgba(0, 159, 253, 0.9)
+        );
+        background-size: cover;
+        padding: 4rem 0;
+      }
+
+      .upload-box {
+        border: 2px dashed var(--primary);
+        transition: all 0.3s ease;
+        background: white;
+      }
+
+      .upload-box:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .certificate {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      #countdown {
+        font-weight: bold;
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar Section -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <img
+            src="https://media-tir3-1.cdn.whatsapp.net/v/t61.24694-24/473401369_4025717804352046_4237377556949553071_n.jpg?ccb=11-4&oh=01_Q5AaIaakNdiQxtpSMUKShX5OV1_z64Nrd0R-qLZQ6tvYRSlc&oe=67E2703F&_nc_sid=5e03e0&_nc_cat=101"
+            alt="Techverse 2025"
+            height="40"
+            class="d-inline-block align-text-top"
+          />
+          Techverse 2025
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="#upload">Upload</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#certificate">Certificate</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section text-white py-5">
+      <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">Techverse 2025 Hackathon</h1>
+        <div id="countdown" class="fs-2 mb-4">6 Days Remaining!</div>
+        <a href="#upload" class="btn btn-light btn-lg px-5">Submit Project</a>
+      </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload" class="py-5">
+      <div class="container">
+        <h2 class="text-center mb-4">Project Submission</h2>
+        <div class="upload-box p-5 text-center" id="dropZone">
+          <input type="file" id="fileInput" multiple class="d-none" />
+          <button
+            onclick="document.getElementById('fileInput').click()"
+            class="btn btn-primary btn-lg mb-3"
+          >
+            Choose Files
+          </button>
+          <p class="text-muted">
+            Drag & drop files or click to upload (Max: 20 files)
+          </p>
+          <div id="fileList" class="mt-3"></div>
+          <button class="btn btn-success mt-3" onclick="handleUpload()">
+            Submit Project
+          </button>
+          <div id="uploadStatus" class="mt-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Certificate Section -->
+    <section id="certificate" class="py-5 bg-light">
+      <div class="container">
+        <h2 class="text-center mb-4">Download E-Certificate</h2>
+        <div class="certificate p-4 text-center">
+          <h3 class="mb-4">Certificate of Participation</h3>
+          <div class="mb-3">
+            <input
+              type="text"
+              id="nameInput"
+              class="form-control"
+              placeholder="Enter your full name"
+            />
+          </div>
+          <button
+            class="btn btn-warning btn-lg"
+            onclick="generateCertificate()"
+          >
+            Download Certificate
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      async function handleUpload() {
+        const files = document.getElementById("fileInput").files;
+        const uploadStatus = document.getElementById("uploadStatus");
+
+        if (files.length === 0) {
+          uploadStatus.innerHTML =
+            '<div class="alert alert-danger">Please select files first!</div>';
+          return;
+        }
+
+        if (files.length > 20) {
+          uploadStatus.innerHTML =
+            '<div class="alert alert-danger">Please select a maximum of 20 files!</div>';
+          return;
+        }
+
+        const formData = new FormData();
+        Array.from(files).forEach((file) => formData.append("files[]", file));
+
+        try {
+          uploadStatus.innerHTML =
+            '<div class="alert alert-info">Uploading files...</div>';
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Upload failed");
+          }
+
+          uploadStatus.innerHTML =
+            '<div class="alert alert-success">Files uploaded successfully!</div>';
+        } catch (error) {
+          console.error("Error:", error);
+          uploadStatus.innerHTML = `<div class="alert alert-danger">Upload failed: ${error.message}</div>`;
+        }
+      }
+
+      async function generateCertificate() {
+        const nameInput = document.getElementById("nameInput");
+        const participantName = nameInput.value.trim();
+
+        if (!participantName) {
+          alert("Please enter your name to generate a certificate");
+          nameInput.focus();
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/generate-certificate?name=${encodeURIComponent(participantName)}`
+          );
+
+          if (!response.ok) {
+            throw new Error("Certificate generation failed");
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${participantName}_certificate.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Failed to generate certificate. Please try again.");
+        }
+      }
+    </script>
+  </body>
+</html>
